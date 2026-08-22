@@ -1,15 +1,28 @@
 import json
 import os
+import sys
 import asyncio
 from typing import List, Optional
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from services.rss_scraper import fetch_all_sources
-from services.translator import translate_articles_in_batch
-from services.deduplicator import deduplicate_news
-from services.classifier import classify_article
+# Asegurar que el directorio backend esté en sys.path
+backend_dir = os.path.dirname(__file__)
+if backend_dir not in sys.path:
+    sys.path.insert(0, backend_dir)
+
+try:
+    from services.rss_scraper import fetch_all_sources
+    from services.translator import translate_articles_in_batch
+    from services.deduplicator import deduplicate_news
+    from services.classifier import classify_article
+except ImportError:
+    from backend.services.rss_scraper import fetch_all_sources
+    from backend.services.translator import translate_articles_in_batch
+    from backend.services.deduplicator import deduplicate_news
+    from backend.services.classifier import classify_article
+
 
 app = FastAPI(title="GlobalNews API", version="1.0.0")
 
