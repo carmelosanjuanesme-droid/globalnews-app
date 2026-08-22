@@ -76,10 +76,17 @@ async def refresh_news_cache():
     NEWS_CACHE["last_updated"] = asyncio.get_event_loop().time()
     print(f"Caché actualizada con {len(deduplicated)} noticias únicas desduplicadas.")
 
+async def background_loop():
+    while True:
+        try:
+            await refresh_news_cache()
+        except Exception as e:
+            print(f"Error en bucle de refresco: {e}")
+        await asyncio.sleep(600) # Cada 10 minutos
+
 @app.on_event("startup")
 async def startup_event():
-    # Cargar primera tanda de noticias en segundo plano
-    asyncio.create_task(refresh_news_cache())
+    asyncio.create_task(background_loop())
 
 @app.get("/")
 def read_root():
@@ -97,7 +104,7 @@ def get_sources():
 def get_news(
     category: Optional[str] = Query("Todas"),
     q: Optional[str] = Query(None),
-    limit: int = Query(50)
+    limit: int = Query(100)
 ):
     articles = NEWS_CACHE["articles"]
     
@@ -118,6 +125,7 @@ def get_news(
         "total_available": len(articles),
         "articles": articles[:limit]
     }
+
 
 @app.post("/api/news/refresh")
 async def trigger_refresh():
