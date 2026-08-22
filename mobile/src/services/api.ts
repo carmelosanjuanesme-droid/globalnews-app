@@ -43,8 +43,10 @@ export async function fetchCategories(): Promise<string[]> {
 
 function getLocalCategories(): string[] {
   return [
-    "Todas", "Política", "Ciencia", "Tecnología", "Deportes", 
-    "Moda", "Arte", "Economía", "Salud", "Entretenimiento", "Medio Ambiente"
+    "Todas", "Colombia & Huila", "Latinoamérica", "Vaticano & Fe", 
+    "Innovación e IA", "Electricidad & Automatización", "Política", 
+    "Ciencia", "Tecnología", "Deportes", "Moda", "Arte", "Economía", 
+    "Salud", "Entretenimiento", "Medio Ambiente"
   ];
 }
 
@@ -55,7 +57,7 @@ export async function fetchNews(category: string = "Todas", query: string = ""):
     if (query) params.append("q", query);
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 8000);
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
     const response = await fetch(`${API_BASE_URL}/news?${params.toString()}`, { signal: controller.signal });
     clearTimeout(timeoutId);
 
@@ -66,7 +68,7 @@ export async function fetchNews(category: string = "Todas", query: string = ""):
       }
     }
   } catch (error) {
-    console.warn("Servidor en nube despertando, usando feed local:", error);
+    console.warn("Servidor en nube actualizando, mostrando feed local:", error);
   }
   return getMockNews(category, query);
 }
@@ -75,126 +77,102 @@ function getMockNews(selectedCategory: string, query: string = ""): NewsArticle[
   const allMocks: NewsArticle[] = [
     {
       id: "news-demo-1",
+      source_id: 11,
+      source_name: "Diario La Nación Huila",
+      country: "Colombia",
+      original_language: "es",
+      default_category: "Colombia & Huila",
+      category: "Colombia & Huila",
+      title: "Huila impulsa megaproyecto de energía solar y desarrollo agrícola en Neiva",
+      title_es: "Huila impulsa megaproyecto de energía solar y desarrollo agrícola en Neiva",
+      summary: "La gobernación del Huila aprueba inversión histórica para modernizar la infraestructura energética del departamento.",
+      summary_es: "La gobernación del Huila aprueba inversión histórica para modernizar la infraestructura energética del departamento.",
+      link: "https://lanacion.com.co",
+      image_url: "https://images.unsplash.com/photo-1509391365360-2e959784a276?auto=format&fit=crop&w=800&q=80",
+      pub_date: "Hace 10 min",
+      related_sources_count: 3,
+      other_sources: [
+        { name: "El Tiempo Colombia", link: "https://www.eltiempo.com", country: "Colombia" }
+      ]
+    },
+    {
+      id: "news-demo-2",
+      source_id: 6,
+      source_name: "Vatican News Español",
+      country: "Vaticano",
+      original_language: "es",
+      default_category: "Vaticano & Fe",
+      category: "Vaticano & Fe",
+      title: "El Papa Francisco pide unidad global y paz en su nuevo mensaje apostólico",
+      title_es: "El Papa Francisco pide unidad global y paz en su nuevo mensaje apostólico",
+      summary: "Desde la Santa Sede, el Santo Padre hace un llamado a los líderes mundiales para fortalecer el diálogo y la solidaridad.",
+      summary_es: "Desde la Santa Sede, el Santo Padre hace un llamado a los líderes mundiales para fortalecer el diálogo y la solidaridad.",
+      link: "https://www.vaticannews.va/es.html",
+      image_url: "https://images.unsplash.com/photo-1548625149-fc4a29cf7092?auto=format&fit=crop&w=800&q=80",
+      pub_date: "Hace 20 min",
+      related_sources_count: 4,
+      other_sources: [
+        { name: "ACI Prensa", link: "https://www.aciprensa.com", country: "Vaticano" }
+      ]
+    },
+    {
+      id: "news-demo-3",
+      source_id: 21,
+      source_name: "MIT Tech Review",
+      country: "EEUU",
+      original_language: "en",
+      default_category: "Innovación e IA",
+      category: "Innovación e IA",
+      title: "Nuevos modelos de Inteligencia Artificial logran razonamiento lógico avanzado",
+      title_es: "Nuevos modelos de Inteligencia Artificial logran razonamiento lógico avanzado",
+      summary: "Investigadores desarrollan arquitecturas de redes neuronales capaces de resolver teoremas complejos con alta precisión.",
+      summary_es: "Investigadores desarrollan arquitecturas de redes neuronales capaces de resolver teoremas complejos con alta precisión.",
+      link: "https://www.technologyreview.com",
+      image_url: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80",
+      pub_date: "Hace 30 min",
+      related_sources_count: 5,
+      other_sources: [
+        { name: "Wired AI", link: "https://www.wired.com", country: "EEUU" }
+      ]
+    },
+    {
+      id: "news-demo-4",
+      source_id: 16,
+      source_name: "IEEE Spectrum",
+      country: "EEUU",
+      original_language: "en",
+      default_category: "Electricidad & Automatización",
+      category: "Electricidad & Automatización",
+      title: "Avances en redes eléctricas inteligentes y sistemas de automatización industrial PLC",
+      title_es: "Avances en redes eléctricas inteligentes y sistemas de automatización industrial PLC",
+      summary: "Ingenieros presentan controladores programables de alta velocidad para optimizar redes de distribución de energía.",
+      summary_es: "Ingenieros presentan controladores programables de alta velocidad para optimizar redes de distribución de energía.",
+      link: "https://spectrum.ieee.org",
+      image_url: "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80",
+      pub_date: "Hace 40 min",
+      related_sources_count: 3,
+      other_sources: [
+        { name: "Automation World", link: "https://www.automationworld.com", country: "EEUU" }
+      ]
+    },
+    {
+      id: "news-demo-5",
       source_id: 67,
       source_name: "Vogue Magazine",
       country: "EEUU",
       original_language: "en",
       default_category: "Moda",
       category: "Moda",
-      title: "Paris Fashion Week 2026: The New Trends for Autumn/Winter",
-      title_es: "Semana de la Moda de París 2026: Las nuevas tendencias para otoño/invierno",
-      summary: "High fashion designers present revolutionary sustainable collections on the Paris runways using recycled fabrics.",
-      summary_es: "Los diseñadores de alta costura presentan revolucionarias colecciones sostenibles en las pasarelas de París utilizando tejidos reciclados y siluetas futuristas.",
+      title: "Semana de la Moda de París 2026: Las nuevas tendencias de alta costura",
+      title_es: "Semana de la Moda de París 2026: Las nuevas tendencias de alta costura",
+      summary: "Los diseñadores presentan colecciones sostenibles con tejidos reciclados y siluetas vanguardistas.",
+      summary_es: "Los diseñadores presentan colecciones sostenibles con tejidos reciclados y siluetas vanguardistas.",
       link: "https://www.vogue.com",
       image_url: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80",
-      pub_date: "Hace 15 min",
-      related_sources_count: 3,
-      other_sources: [
-        { name: "Elle Magazine", link: "https://www.elle.com", country: "EEUU" },
-        { name: "El País S Moda", link: "https://smoda.elpais.com", country: "España" }
-      ]
-    },
-    {
-      id: "news-demo-2",
-      source_id: 84,
-      source_name: "NASA News",
-      country: "EEUU",
-      original_language: "en",
-      default_category: "Ciencia",
-      category: "Ciencia",
-      title: "James Webb Telescope Discovers New Exoplanet with Atmosphere",
-      title_es: "El telescopio James Webb descubre un nuevo exoplaneta con atmósfera habitable",
-      summary: "Astronomers have detected atmospheric water vapor signatures on an Earth-sized planet located 40 light-years away.",
-      summary_es: "Los astrónomos han detectado señales de vapor de agua atmosférico en un planeta del tamaño de la Tierra ubicado a 40 años luz.",
-      link: "https://www.nasa.gov",
-      image_url: "https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?auto=format&fit=crop&w=800&q=80",
-      pub_date: "Hace 30 min",
-      related_sources_count: 5,
-      other_sources: [
-        { name: "Nature News", link: "https://www.nature.com", country: "Internacional" },
-        { name: "ScienceDaily", link: "https://www.sciencedaily.com", country: "EEUU" }
-      ]
-    },
-    {
-      id: "news-demo-3",
-      source_id: 74,
-      source_name: "Artforum",
-      country: "EEUU",
-      original_language: "en",
-      default_category: "Arte",
-      category: "Arte",
-      title: "Venice Biennale 2026 Announces Golden Lion Award Winners",
-      title_es: "La Bienal de Venecia 2026 anuncia los ganadores del León de Oro en Arte Contemporáneo",
-      summary: "The international jury awards top honours to groundbreaking digital sculptures.",
-      summary_es: "El jurado internacional otorga los máximos honores a esculturas digitales innovadoras e instalaciones de salas inmersivas.",
-      link: "https://www.artforum.com",
-      image_url: "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=800&q=80",
-      pub_date: "Hace 45 min",
+      pub_date: "Hace 50 min",
       related_sources_count: 2,
       other_sources: [
-        { name: "The Art Newspaper", link: "https://www.theartnewspaper.com", country: "Reino Unido" }
-      ]
-    },
-    {
-      id: "news-demo-4",
-      source_id: 2,
-      source_name: "BBC News World",
-      country: "Reino Unido",
-      original_language: "en",
-      default_category: "Política",
-      category: "Política",
-      title: "Global Summit Agrees on Historic Climate Protection Pact",
-      title_es: "La Cumbre Mundial acuerda un pacto histórico de protección climática internacional",
-      summary: "World leaders from 190 countries sign a binding agreement to accelerate transition to renewable energy sources.",
-      summary_es: "Líderes mundiales de 190 países firman un acuerdo vinculante para acelerar la transición a fuentes de energía renovable.",
-      link: "https://www.bbc.com/news",
-      image_url: "https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&fit=crop&w=800&q=80",
-      pub_date: "Hace 1 hora",
-      related_sources_count: 8,
-      other_sources: [
-        { name: "Reuters World", link: "https://www.reuters.com", country: "Internacional" },
-        { name: "El País", link: "https://elpais.com", country: "España" }
-      ]
-    },
-    {
-      id: "news-demo-5",
-      source_id: 97,
-      source_name: "Bloomberg Economics",
-      country: "EEUU",
-      original_language: "en",
-      default_category: "Economía",
-      category: "Economía",
-      title: "Global Markets Rally Following Central Bank Interest Rate Cut",
-      title_es: "Los mercados globales se disparan tras el recorte de tipos de interés de los bancos centrales",
-      summary: "Major stock indices worldwide reached new record highs following strategic monetary policy adjustments.",
-      summary_es: "Los principales índices bursátiles de todo el mundo alcanzaron nuevos récords tras ajustes estratégicos de política monetaria.",
-      link: "https://www.bloomberg.com",
-      image_url: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=800&q=80",
-      pub_date: "Hace 1 hora",
-      related_sources_count: 4,
-      other_sources: [
-        { name: "Financial Times", link: "https://www.ft.com", country: "Reino Unido" },
-        { name: "Wall Street Journal", link: "https://www.wsj.com", country: "EEUU" }
-      ]
-    },
-    {
-      id: "news-demo-6",
-      source_id: 92,
-      source_name: "Marca.com",
-      country: "España",
-      original_language: "es",
-      default_category: "Deportes",
-      category: "Deportes",
-      title: "La Champions League entra en su fase decisiva con partidos electrizantes",
-      title_es: "La Champions League entra en su fase decisiva con partidos electrizantes",
-      summary: "Los principales clubes del continente europeo se enfrentan en los cuartos de final de la máxima competición.",
-      summary_es: "Los principales clubes del continente europeo se enfrentan en los cuartos de final de la máxima competición internacional.",
-      link: "https://www.marca.com",
-      image_url: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=800&q=80",
-      pub_date: "Hace 2 horas",
-      related_sources_count: 4,
-      other_sources: [
-        { name: "L'Équipe", link: "https://www.lequipe.fr", country: "Francia" }
+        { name: "Elle Magazine", link: "https://www.elle.com", country: "EEUU" }
       ]
     }
   ];

@@ -8,6 +8,7 @@ interface NewsCardProps {
 }
 
 export const NewsCard: React.FC<NewsCardProps> = ({ article, onPress }) => {
+  // Garantizar el uso prioritario del texto traducido al español
   const displayTitle = article.title_es || article.title;
   const displaySummary = article.summary_es || article.summary;
 
@@ -40,12 +41,12 @@ export const NewsCard: React.FC<NewsCardProps> = ({ article, onPress }) => {
           </Text>
         </View>
 
-        {/* Titular traducido */}
+        {/* Titular traducido al español */}
         <Text style={styles.title} numberOfLines={2}>
           {displayTitle}
         </Text>
 
-        {/* Resumen corto */}
+        {/* Resumen traducido al español */}
         {displaySummary ? (
           <Text style={styles.summary} numberOfLines={2}>
             {displaySummary}
