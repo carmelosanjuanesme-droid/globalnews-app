@@ -27,16 +27,25 @@ const API_BASE_URL = "https://globalnews-api-g582.onrender.com/api";
 
 export async function fetchCategories(): Promise<string[]> {
   try {
-    const response = await fetch(`${API_BASE_URL}/categories`);
-    const data = await response.json();
-    return data.categories || [];
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 6000);
+    const response = await fetch(`${API_BASE_URL}/categories`, { signal: controller.signal });
+    clearTimeout(timeoutId);
+    if (response.ok) {
+      const data = await response.json();
+      return data.categories || getLocalCategories();
+    }
   } catch (error) {
-    console.warn("Usando categorías locales de respaldo:", error);
-    return [
-      "Todas", "Política", "Ciencia", "Tecnología", "Deportes", 
-      "Moda", "Arte", "Economía", "Salud", "Entretenimiento", "Medio Ambiente"
-    ];
+    console.warn("Usando categorías locales:", error);
   }
+  return getLocalCategories();
+}
+
+function getLocalCategories(): string[] {
+  return [
+    "Todas", "Política", "Ciencia", "Tecnología", "Deportes", 
+    "Moda", "Arte", "Economía", "Salud", "Entretenimiento", "Medio Ambiente"
+  ];
 }
 
 export async function fetchNews(category: string = "Todas", query: string = ""): Promise<NewsArticle[]> {
@@ -45,17 +54,24 @@ export async function fetchNews(category: string = "Todas", query: string = ""):
     if (category !== "Todas") params.append("category", category);
     if (query) params.append("q", query);
 
-    const response = await fetch(`${API_BASE_URL}/news?${params.toString()}`);
-    const data = await response.json();
-    return data.articles || [];
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000);
+    const response = await fetch(`${API_BASE_URL}/news?${params.toString()}`, { signal: controller.signal });
+    clearTimeout(timeoutId);
+
+    if (response.ok) {
+      const data = await response.json();
+      if (data.articles && data.articles.length > 0) {
+        return data.articles;
+      }
+    }
   } catch (error) {
-    console.warn("Usando datos de demostración de respaldo:", error);
-    return getMockNews(category);
+    console.warn("Servidor en nube despertando, usando feed local:", error);
   }
+  return getMockNews(category, query);
 }
 
-// Datos de respaldo con imágenes e ilustraciones reales para vista previa instantánea
-function getMockNews(selectedCategory: string): NewsArticle[] {
+function getMockNews(selectedCategory: string, query: string = ""): NewsArticle[] {
   const allMocks: NewsArticle[] = [
     {
       id: "news-demo-1",
@@ -67,7 +83,7 @@ function getMockNews(selectedCategory: string): NewsArticle[] {
       category: "Moda",
       title: "Paris Fashion Week 2026: The New Trends for Autumn/Winter",
       title_es: "Semana de la Moda de París 2026: Las nuevas tendencias para otoño/invierno",
-      summary: "High fashion designers present revolutionary sustainable collections on the Paris runways using recycled fabrics and futuristic silhouettes.",
+      summary: "High fashion designers present revolutionary sustainable collections on the Paris runways using recycled fabrics.",
       summary_es: "Los diseñadores de alta costura presentan revolucionarias colecciones sostenibles en las pasarelas de París utilizando tejidos reciclados y siluetas futuristas.",
       link: "https://www.vogue.com",
       image_url: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80",
@@ -109,7 +125,7 @@ function getMockNews(selectedCategory: string): NewsArticle[] {
       category: "Arte",
       title: "Venice Biennale 2026 Announces Golden Lion Award Winners",
       title_es: "La Bienal de Venecia 2026 anuncia los ganadores del León de Oro en Arte Contemporáneo",
-      summary: "The international jury awards top honours to groundbreaking digital sculptures and immersive room installations.",
+      summary: "The international jury awards top honours to groundbreaking digital sculptures.",
       summary_es: "El jurado internacional otorga los máximos honores a esculturas digitales innovadoras e instalaciones de salas inmersivas.",
       link: "https://www.artforum.com",
       image_url: "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=800&q=80",
@@ -137,12 +153,32 @@ function getMockNews(selectedCategory: string): NewsArticle[] {
       related_sources_count: 8,
       other_sources: [
         { name: "Reuters World", link: "https://www.reuters.com", country: "Internacional" },
-        { name: "El País", link: "https://elpais.com", country: "España" },
-        { name: "France 24", link: "https://www.france24.com", country: "Francia" }
+        { name: "El País", link: "https://elpais.com", country: "España" }
       ]
     },
     {
       id: "news-demo-5",
+      source_id: 97,
+      source_name: "Bloomberg Economics",
+      country: "EEUU",
+      original_language: "en",
+      default_category: "Economía",
+      category: "Economía",
+      title: "Global Markets Rally Following Central Bank Interest Rate Cut",
+      title_es: "Los mercados globales se disparan tras el recorte de tipos de interés de los bancos centrales",
+      summary: "Major stock indices worldwide reached new record highs following strategic monetary policy adjustments.",
+      summary_es: "Los principales índices bursátiles de todo el mundo alcanzaron nuevos récords tras ajustes estratégicos de política monetaria.",
+      link: "https://www.bloomberg.com",
+      image_url: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=800&q=80",
+      pub_date: "Hace 1 hora",
+      related_sources_count: 4,
+      other_sources: [
+        { name: "Financial Times", link: "https://www.ft.com", country: "Reino Unido" },
+        { name: "Wall Street Journal", link: "https://www.wsj.com", country: "EEUU" }
+      ]
+    },
+    {
+      id: "news-demo-6",
       source_id: 92,
       source_name: "Marca.com",
       country: "España",
@@ -151,21 +187,25 @@ function getMockNews(selectedCategory: string): NewsArticle[] {
       category: "Deportes",
       title: "La Champions League entra en su fase decisiva con partidos electrizantes",
       title_es: "La Champions League entra en su fase decisiva con partidos electrizantes",
-      summary: "Los principales clubes del continente europeo se enfrentan en los cuartos de final de la máxima competición internacional.",
+      summary: "Los principales clubes del continente europeo se enfrentan en los cuartos de final de la máxima competición.",
       summary_es: "Los principales clubes del continente europeo se enfrentan en los cuartos de final de la máxima competición internacional.",
       link: "https://www.marca.com",
       image_url: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=800&q=80",
       pub_date: "Hace 2 horas",
       related_sources_count: 4,
       other_sources: [
-        { name: "L'Équipe", link: "https://www.lequipe.fr", country: "Francia" },
-        { name: "La Gazzetta dello Sport", link: "https://www.gazzetta.it", country: "Italia" }
+        { name: "L'Équipe", link: "https://www.lequipe.fr", country: "Francia" }
       ]
     }
   ];
 
-  if (selectedCategory === "Todas") {
-    return allMocks;
+  let filtered = allMocks;
+  if (selectedCategory && selectedCategory !== "Todas") {
+    filtered = allMocks.filter(m => m.category === selectedCategory);
   }
-  return allMocks.filter(m => m.category === selectedCategory);
+  if (query) {
+    const qLower = query.toLowerCase();
+    filtered = filtered.filter(m => m.title_es.toLowerCase().includes(qLower) || m.summary_es.toLowerCase().includes(qLower));
+  }
+  return filtered;
 }
