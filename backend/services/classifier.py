@@ -2,6 +2,27 @@ import re
 from typing import Dict, Any
 
 CATEGORY_KEYWORDS = {
+    "Colombia & Huila": [
+        "colombia", "huila", "neiva", "bogotá", "medellín", "cali", "garzón", "pitalito", 
+        "opita", "el tiempo", "espectador", "semana", "colombiano"
+    ],
+    "Latinoamérica": [
+        "latinoamérica", "latin america", "américa latina", "venezuela", "méxico", "argentina", 
+        "brasil", "chile", "perú", "ecuador", "bolivia", "caribe", "sudamérica"
+    ],
+    "Vaticano & Fe": [
+        "vaticano", "vatican", "papa", "pope", "francisco", "católico", "católica", "iglesia", 
+        "fe", "obispo", "santo padre", "evangelio", "misa", "vaticannews", "aciprensa"
+    ],
+    "Innovación e IA": [
+        "inteligencia artificial", "artificial intelligence", "ia", "ai", "chatgpt", "llm", 
+        "openai", "gemini", "innovación", "innovation", "algoritmo", "machine learning", "deep learning"
+    ],
+    "Electricidad & Automatización": [
+        "electricidad", "electricity", "energía", "power grid", "electrónica", "electronics", 
+        "automatización", "automation", "plc", "scada", "robótica industrial", "circuito", 
+        "transformador", "ieee", "voltaje", "corriente", "inversor", "subestación"
+    ],
     "Moda": [
         "moda", "fashion", "vogue", "estilo", "style", "pasarela", "runway", "designer", 
         "diseñador", "vestido", "dress", "haute couture", "alta costura", "supermodel", 
@@ -18,9 +39,8 @@ CATEGORY_KEYWORDS = {
         "telescopio", "planeta", "marte", "luna", "científicos"
     ],
     "Tecnología": [
-        "tecnología", "technology", "tech", "ia", "ai", "inteligencia artificial", "artificial intelligence", 
-        "apple", "google", "microsoft", "smartphone", "software", "robot", "ciberseguridad", 
-        "app", "cripto", "bitcoin", "redes sociales"
+        "tecnología", "technology", "tech", "apple", "google", "microsoft", "smartphone", 
+        "software", "ciberseguridad", "app", "cripto", "bitcoin", "redes sociales"
     ],
     "Deportes": [
         "deportes", "sports", "fútbol", "football", "soccer", "baloncesto", "basketball", 

@@ -46,8 +46,10 @@ def load_sources():
 
 SOURCES = load_sources()
 CATEGORIES = [
-    "Todas", "Política", "Ciencia", "Tecnología", "Deportes", 
-    "Moda", "Arte", "Economía", "Salud", "Entretenimiento", "Medio Ambiente"
+    "Todas", "Colombia & Huila", "Latinoamérica", "Vaticano & Fe", 
+    "Innovación e IA", "Electricidad & Automatización", "Política", 
+    "Ciencia", "Tecnología", "Deportes", "Moda", "Arte", "Economía", 
+    "Salud", "Entretenimiento", "Medio Ambiente"
 ]
 
 # Caché en memoria de noticias procesadas
