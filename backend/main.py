@@ -46,10 +46,12 @@ def load_sources():
 
 SOURCES = load_sources()
 CATEGORIES = [
-    "Todas", "Colombia & Huila", "Latinoamérica", "Vaticano & Fe", 
-    "Innovación e IA", "Electricidad & Automatización", "Política", 
-    "Ciencia", "Tecnología", "Deportes", "Moda", "Arte", "Economía", 
-    "Salud", "Entretenimiento", "Medio Ambiente"
+    "Todas", "De La Espriella", "Política Colombia", "Bogotá", "Medellín", 
+    "Cali", "Barranquilla", "Colombia & Huila", "Latinoamérica", "Vaticano & Fe", 
+    "Innovación e IA", "Electricidad & Automatización", "Animales", "Espacio", 
+    "Universidades", "Empresas", "Liderazgo", "Política", "Ciencia", 
+    "Tecnología", "Deportes", "Moda", "Arte", "Economía", "Salud", 
+    "Entretenimiento", "Medio Ambiente"
 ]
 
 # Caché en memoria de noticias procesadas
@@ -60,7 +62,7 @@ NEWS_CACHE = {
 
 async def refresh_news_cache():
     """Obtiene, traduce, desduplica y clasifica noticias de las 120 fuentes."""
-    print("Iniciando actualización de noticias desde 120 fuentes...")
+    print("Iniciando actualización de noticias desde 150 fuentes...")
     raw_articles = await fetch_all_sources(SOURCES)
     print(f"Obtenidos {len(raw_articles)} artículos brutos.")
     
@@ -92,7 +94,7 @@ async def startup_event():
 
 @app.get("/")
 def read_root():
-    return {"message": "API de Noticias Globales activa. 120 Fuentes integradas."}
+    return {"message": "API de Noticias Globales activa. 150 Fuentes integradas."}
 
 @app.get("/api/categories")
 def get_categories():
@@ -106,7 +108,7 @@ def get_sources():
 def get_news(
     category: Optional[str] = Query("Todas"),
     q: Optional[str] = Query(None),
-    limit: int = Query(100)
+    limit: int = Query(150)
 ):
     articles = NEWS_CACHE["articles"]
     

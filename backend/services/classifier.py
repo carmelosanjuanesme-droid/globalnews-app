@@ -2,9 +2,52 @@ import re
 from typing import Dict, Any
 
 CATEGORY_KEYWORDS = {
+    "De La Espriella": [
+        "de la espriella", "abelardo de la espriella", "delaespriella", "espriella lawyers"
+    ],
+    "Política Colombia": [
+        "política colombia", "petro", "gustavo petro", "congreso colombia", "senado colombia", 
+        "cámara colombia", "la silla vacía", "cambio colombia", "uribe", "corte constitucional", 
+        "fiscalía colombia", "defensoría", "cancillería colombia"
+    ],
+    "Bogotá": [
+        "bogotá", "bogota", "galán", "alcaldía de bogotá", "transmilenio", "metro de bogotá", 
+        "cundinamarca", "suba", "usaquén", "engativá", "chapinero"
+    ],
+    "Medellín": [
+        "medellín", "medellin", "antioquia", "fico gutiérrez", "alcaldía de medellín", 
+        "metro de medellín", "el poblado", "laureles", "bello", "envigado", "el colombiano"
+    ],
+    "Cali": [
+        "cali", "valle del cauca", "eder", "alcaldía de cali", "mio cali", "el país cali", 
+        "jamundí", "yumbo", "palmira", "90 minutos"
+    ],
+    "Barranquilla": [
+        "barranquilla", "atlántico", "char", "alcaldía de barranquilla", "el heraldo", 
+        "zona cero", "carnaval de barranquilla", "soledad", "puerto colombia"
+    ],
+    "Animales": [
+        "animales", "animal", "fauna", "mascota", "mascotas", "perro", "gato", "perros", 
+        "gatos", "especie", "biodiversidad", "silvestre", "wwf", "animanaturalis", "zoología", "veterinaria"
+    ],
+    "Espacio": [
+        "espacio", "space", "astronomía", "astronomy", "nasa", "esa", "telescopio", "james webb", 
+        "hubble", "exoplaneta", "galaxia", "universo", "sistema solar", "marte", "luna", "órbita", "cohete", "spacex"
+    ],
+    "Universidades": [
+        "universidad", "universidades", "universia", "educación superior", "educación", 
+        "estudiantes", "campus", "carrera", "becas", "académico", "investigación universitaria", "rector"
+    ],
+    "Empresas": [
+        "empresas", "empresa", "compañía", "negocios", "business", "portafolio", "dinero", 
+        "forbes", "bloomberg línea", "sector privado", "multinacional", "startup", "pymes", "inversión privada"
+    ],
+    "Liderazgo": [
+        "liderazgo", "leadership", "management", "gerencia", "líder", "líderes", "estrategia empresarial", 
+        "entrepreneur", "harvard business review", "mckinsey", "productividad", "cultura organizacional", "ceo"
+    ],
     "Colombia & Huila": [
-        "colombia", "huila", "neiva", "bogotá", "medellín", "cali", "garzón", "pitalito", 
-        "opita", "el tiempo", "espectador", "semana", "colombiano"
+        "huila", "neiva", "garzón", "pitalito", "opita", "la nación huila", "colombiano"
     ],
     "Latinoamérica": [
         "latinoamérica", "latin america", "américa latina", "venezuela", "méxico", "argentina", 
@@ -34,9 +77,8 @@ CATEGORY_KEYWORDS = {
         "literatura", "novela", "arquitectura", "design", "fotografía"
     ],
     "Ciencia": [
-        "ciencia", "science", "investigación", "research", "estudio", "study", "espacio", 
-        "space", "nasa", "astronomía", "física", "química", "biología", "genética", "descubrimiento", 
-        "telescopio", "planeta", "marte", "luna", "científicos"
+        "ciencia", "science", "investigación", "research", "estudio", "study", "física", 
+        "química", "biología", "genética", "descubrimiento", "científicos"
     ],
     "Tecnología": [
         "tecnología", "technology", "tech", "apple", "google", "microsoft", "smartphone", 
@@ -54,7 +96,7 @@ CATEGORY_KEYWORDS = {
     ],
     "Economía": [
         "economía", "economy", "finanzas", "finance", "mercado", "market", "bolsa", "stocks", 
-        "inflación", "banco central", "dólar", "euro", "empresa", "negocios", "inversión"
+        "inflación", "banco central", "dólar", "euro"
     ],
     "Salud": [
         "salud", "health", "medicina", "medicine", "virus", "vacuna", "vaccine", "enfermedad", 
@@ -76,7 +118,6 @@ def classify_article(article: Dict[str, Any]) -> str:
     
     text = (article.get("title_es", "") + " " + article.get("summary_es", "") + " " + article.get("title", "")).lower()
     
-    # Evaluar puntuaciones de coincidencia de palabras clave
     category_scores = {}
     for cat, keywords in CATEGORY_KEYWORDS.items():
         score = sum(1 for word in keywords if re.search(r'\b' + re.escape(word) + r'\b', text))

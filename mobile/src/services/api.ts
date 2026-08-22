@@ -43,10 +43,12 @@ export async function fetchCategories(): Promise<string[]> {
 
 function getLocalCategories(): string[] {
   return [
-    "Todas", "Colombia & Huila", "Latinoamérica", "Vaticano & Fe", 
-    "Innovación e IA", "Electricidad & Automatización", "Política", 
-    "Ciencia", "Tecnología", "Deportes", "Moda", "Arte", "Economía", 
-    "Salud", "Entretenimiento", "Medio Ambiente"
+    "Todas", "De La Espriella", "Política Colombia", "Bogotá", "Medellín", 
+    "Cali", "Barranquilla", "Colombia & Huila", "Latinoamérica", "Vaticano & Fe", 
+    "Innovación e IA", "Electricidad & Automatización", "Animales", "Espacio", 
+    "Universidades", "Empresas", "Liderazgo", "Política", "Ciencia", 
+    "Tecnología", "Deportes", "Moda", "Arte", "Economía", "Salud", 
+    "Entretenimiento", "Medio Ambiente"
   ];
 }
 
