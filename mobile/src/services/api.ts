@@ -23,7 +23,7 @@ export interface NewsArticle {
   other_sources: SourceRef[];
 }
 
-const API_BASE_URL = "http://192.168.2.195:8000/api";
+const API_BASE_URL = "https://globalnews-api-g582.onrender.com/api";
 
 export async function fetchCategories(): Promise<string[]> {
   try {
