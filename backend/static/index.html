@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GlobalNews Daily - 150 Fuentes Sin Repetir</title>
+  <link rel="manifest" href="/static/manifest.json">
+  <style>
+    :root {
+      --bg: #121214;
+      --card-bg: #1e1e24;
+      --border: #2d2d35;
+      --accent: #3b82f6;
+      --text: #f4f4f5;
+      --text-muted: #a1a1aa;
+      --green: #166534;
+      --green-text: #4ade80;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background: var(--bg); color: var(--text); padding-bottom: 40px; }
+    
+    header { background: var(--bg); padding: 16px; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+    .brand-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .brand-title { font-size: 22px; font-weight: 900; letter-spacing: 0.5px; }
+    .badge { background: var(--green); color: var(--green-text); padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; }
+    
+    .search-input { width: 100%; padding: 12px 16px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; color: var(--text); font-size: 14px; outline: none; }
+    
+    .category-bar { display: flex; overflow-x: auto; padding: 12px 16px; gap: 8px; border-bottom: 1px solid var(--border); background: var(--bg); scrollbar-width: none; }
+    .category-bar::-webkit-scrollbar { display: none; }
+    .pill { padding: 8px 16px; background: var(--card-bg); border-radius: 20px; color: var(--text-muted); font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: 0.2s; }
+    .pill.active { background: var(--accent); color: #fff; }
+    
+    .feed { max-width: 700px; margin: 16px auto; padding: 0 16px; }
+    .news-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; margin-bottom: 20px; transition: transform 0.2s; cursor: pointer; }
+    .news-card:hover { transform: translateY(-2px); }
+    .news-img { width: 100%; height: 200px; object-fit: cover; background: #2a2a32; }
+    .card-body { padding: 16px; }
+    .meta { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 12px; }
+    .cat-badge { background: var(--accent); color: #fff; padding: 3px 8px; border-radius: 8px; font-weight: 700; text-transform: uppercase; font-size: 10px; }
+    .source-info { color: var(--text-muted); }
+    .title { font-size: 18px; font-weight: 700; line-height: 1.4; margin-bottom: 8px; color: var(--text); }
+    .summary { font-size: 14px; color: #d4d4d8; line-height: 1.5; margin-bottom: 12px; }
+    
+    .card-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); pt: 10px; margin-top: 6px; font-size: 11px; }
+    .dedup-badge { background: var(--green); color: var(--green-text); padding: 4px 8px; border-radius: 6px; font-weight: 600; }
+
+    /* Modal Lector */
+    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 200; justify-content: center; align-items: center; padding: 16px; }
+    .modal.active { display: flex; }
+    .modal-content { background: var(--card-bg); border-radius: 20px; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 20px; border: 1px solid var(--border); }
+    .close-btn { background: none; border: none; color: var(--accent); font-size: 16px; font-weight: 700; cursor: pointer; float: right; }
+    
+    .loading { text-align: center; padding: 40px; color: var(--text-muted); }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand-row">
+      <div class="brand-title">GlobalNews</div>
+      <div class="badge">150 Fuentes Al Día</div>
+    </div>
+    <input type="text" id="searchInput" class="search-input" placeholder="🔍 Buscar noticias, Huila, De La Espriella, IA..." oninput="onSearch()">
+  </header>
+
+  <div class="category-bar" id="categoryBar"></div>
+
+  <div class="feed" id="newsFeed">
+    <div class="loading">Cargando 150 noticias del mundo sin repetir...</div>
+  </div>
+
+  <!-- Modal Lector -->
+  <div class="modal" id="readerModal">
+    <div class="modal-content">
+      <button class="close-btn" onclick="closeModal()">✕ Cerrar</button>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+  <script>
+    let allNews = [];
+    let currentCategory = "Todas";
+
+    async function init() {
+      await fetchCategories();
+      await fetchNews();
+    }
+
+    async function fetchCategories() {
+      try {
+        const res = await fetch('/api/categories');
+        const data = await res.json();
+        renderCategories(data.categories || []);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function renderCategories(cats) {
+      const container = document.getElementById('categoryBar');
+      container.innerHTML = cats.map(c => 
+        `<div class="pill ${c === currentCategory ? 'active' : ''}" onclick="selectCategory('${c}')">${c}</div>`
+      ).join('');
+    }
+
+    async function selectCategory(cat) {
+      currentCategory = cat;
+      const pills = document.querySelectorAll('.pill');
+      pills.forEach(p => p.classList.toggle('active', p.innerText === cat));
+      await fetchNews();
+    }
+
+    async function fetchNews() {
+      const feed = document.getElementById('newsFeed');
+      feed.innerHTML = '<div class="loading">Cargando noticias desduplicadas en español...</div>';
+      
+      const q = document.getElementById('searchInput').value;
+      let url = `/api/news?limit=150`;
+      if (currentCategory !== 'Todas') url += `&category=${encodeURIComponent(currentCategory)}`;
+      if (q) url += `&q=${encodeURIComponent(q)}`;
+
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        allNews = data.articles || [];
+        renderNews(allNews);
+      } catch (e) {
+        feed.innerHTML = '<div class="loading">Error cargando noticias.</div>';
+      }
+    }
+
+    function renderNews(articles) {
+      const feed = document.getElementById('newsFeed');
+      if (!articles || articles.length === 0) {
+        feed.innerHTML = `<div class="loading">No hay noticias en "${currentCategory}".</div>`;
+        return;
+      }
+
+      feed.innerHTML = articles.map(a => `
+        <div class="news-card" onclick="openModal('${a.id}')">
+          ${a.image_url ? `<img src="${a.image_url}" class="news-img" loading="lazy">` : ''}
+          <div class="card-body">
+            <div class="meta">
+              <span class="cat-badge">${a.category}</span>
+              <span class="source-info">${a.source_name} (${a.country})</span>
+            </div>
+            <div class="title">${a.title}</div>
+            <div class="summary">${a.summary || ''}</div>
+            <div class="card-footer">
+              ${a.related_sources_count > 1 ? `<span class="dedup-badge">⚡ ${a.related_sources_count} fuentes unificadas (Sin repetir)</span>` : '<span>Fuente única</span>'}
+              <span>${a.pub_date || 'Reciente'}</span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function onSearch() {
+      fetchNews();
+    }
+
+    function openModal(id) {
+      const article = allNews.find(a => a.id === id);
+      if (!article) return;
+
+      const body = document.getElementById('modalBody');
+      body.innerHTML = `
+        <div style="color: var(--accent); font-weight:700; margin-bottom:6px;">${article.category} • ${article.source_name} (${article.country})</div>
+        ${article.image_url ? `<img src="${article.image_url}" style="width:100%; border-radius:12px; margin-bottom:16px;">` : ''}
+        <h2 style="font-size:22px; font-weight:800; margin-bottom:12px;">${article.title}</h2>
+        <p style="font-size:15px; line-height:1.6; color:#d4d4d8; margin-bottom:20px;">${article.summary}</p>
+        
+        ${article.other_sources && article.other_sources.length > 0 ? `
+          <div style="background:#1e1e24; padding:12px; border-radius:10px; margin-bottom:16px;">
+            <div style="color:#4ade80; font-weight:700; margin-bottom:8px;">🌐 Cobertura Unificada (${article.related_sources_count} Medios Mundiales):</div>
+            ${article.other_sources.map(s => `<div style="padding:4px 0; font-size:13px;">• ${s.name} (${s.country}) - <a href="${s.link}" target="_blank" style="color:var(--accent);">Ver noticia</a></div>`).join('')}
+          </div>
+        ` : ''}
+
+        <a href="${article.link}" target="_blank" style="display:block; text-align:center; background:var(--accent); color:#fff; padding:12px; border-radius:10px; text-decoration:none; font-weight:700;">Leer en fuente oficial ↗</a>
+      `;
+
+      document.getElementById('readerModal').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('readerModal').classList.remove('active');
+    }
+
+    init();
+  </script>
+</body>
+</html>

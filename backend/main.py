@@ -92,9 +92,20 @@ async def background_loop():
 async def startup_event():
     asyncio.create_task(background_loop())
 
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
+
+STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
+if os.path.exists(STATIC_DIR):
+    app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+
 @app.get("/")
 def read_root():
+    index_path = os.path.join(STATIC_DIR, "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path)
     return {"message": "API de Noticias Globales activa. 150 Fuentes integradas."}
+
 
 @app.get("/api/categories")
 def get_categories():
