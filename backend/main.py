@@ -122,11 +122,20 @@ def get_news(
             if query_lower in a.get("title_es", "").lower() or query_lower in a.get("summary_es", "").lower()
         ]
         
+    # Garantizar que los campos devueltos tengan el texto traducido al español
+    formatted_articles = []
+    for a in articles[:limit]:
+        item = a.copy()
+        item["title"] = item.get("title_es") or item.get("title")
+        item["summary"] = item.get("summary_es") or item.get("summary")
+        formatted_articles.append(item)
+
     return {
-        "count": len(articles[:limit]),
+        "count": len(formatted_articles),
         "total_available": len(articles),
-        "articles": articles[:limit]
+        "articles": formatted_articles
     }
+
 
 
 @app.post("/api/news/refresh")
